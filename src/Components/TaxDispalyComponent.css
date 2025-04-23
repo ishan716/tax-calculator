@@ -1,0 +1,65 @@
+.text-bracket-breakdown {
+    background-color: #1a1a2e;
+    color: #ffffff;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    max-width: 900px;
+    margin: 2rem auto;
+  }
+  
+  .text-bracket-breakdown h2 {
+    text-align: center;
+    font-size: 1.8rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid #444;
+    padding-bottom: 0.5rem;
+    color: #f0f0f0;
+  }
+  
+  .taxt-table {
+    width: 100%;
+    border-collapse: collapse;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  
+  .taxt-table th,
+  .taxt-table td {
+    padding: 1rem;
+    text-align: center;
+    border-bottom: 1px solid #333;
+  }
+  
+  .taxt-table th {
+    background-color: #2c2c3e;
+    color: #ffffff;
+    font-weight: bold;
+  }
+  
+  .taxt-table tr:nth-child(even) {
+    background-color: #24243a;
+  }
+  
+  .taxt-table tr:hover {
+    background-color: #393963;
+    transition: background-color 0.3s ease-in-out;
+  }
+  
+  .taxt-table td {
+    color: #f1f1f1;
+  }
+  
+  @media (max-width: 768px) {
+    .text-bracket-breakdown {
+      padding: 1rem;
+    }
+  
+    .taxt-table th,
+    .taxt-table td {
+      font-size: 0.9rem;
+      padding: 0.7rem;
+    }
+  }
+  
