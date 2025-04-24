@@ -1,54 +1,70 @@
 import React, { useContext, useEffect, useState } from "react";
 import { IncomeContext } from './InputComponent';
-import "./TaxDispalyComponent.css";
+import "./TaxDisplayComponent.css";
 
+function TaxDisplayComponent() {
+  const { income, mode } = useContext(IncomeContext);
 
-function TaxDispalyComponent() {
-  const income = useContext(IncomeContext);
-  const [tax1, setTax1] = useState(0);
-  const [tax2, setTax2] = useState(0);
-  const [tax3, setTax3] = useState(0);
-  const [tax4, setTax4] = useState(0);
-  const [tax5, setTax5] = useState(0);
+  const [brackets, setBrackets] = useState([]);
+  const [taxes, setTaxes] = useState([]);
 
   useEffect(() => {
-    let t1 = 0, t2 = 0, t3 = 0, t4 = 0 ,t5=0;
+    let newBrackets = [];
+    let calculatedTaxes = [];
 
-    if (income > 150000) {
-      const bracket1 = Math.min(income, 233333.34) - 150000;
-      t1 = bracket1 * 0.06;
+    if (mode === "monthly") {
+      newBrackets = [
+        { limit: 150000, rate: 0.00 },
+        { limit: 233333.34, rate: 0.06 },
+        { limit: 275000, rate: 0.18 },
+        { limit: 316666.67, rate: 0.24 },
+        { limit: 358333.34, rate: 0.30 },
+        { limit: Infinity, rate: 0.36 }
+      ];
+    } else {
+      newBrackets = [
+        { limit: 1800000, rate: 0.00 },
+        { limit: 2800000, rate: 0.06 },
+        { limit: 3300000, rate: 0.12 },
+        { limit: 3800000, rate: 0.18 },
+        { limit: 4300000, rate: 0.24 },
+        { limit: Infinity, rate: 0.30 }
+      ];
     }
 
-    if (income > 233333.34) {
-      const bracket2 = Math.min(income, 275000) - 233333.34;
-      t2 = bracket2 * 0.18;
+    let taxes = [];
+    let previousLimit = 0;
+
+    for (let i = 0; i < newBrackets.length; i++) {
+      const bracket = newBrackets[i];
+      const taxableIncome = Math.max(0, Math.min(income, bracket.limit) - previousLimit);
+      taxes.push(taxableIncome * bracket.rate);
+      previousLimit = bracket.limit;
     }
 
-    if (income > 275000) {
-      const bracket3 = Math.min(income, 316666.67) - 275000;
-      t3 = bracket3 * 0.24;
-    }
+    setBrackets(newBrackets);
+    setTaxes(taxes);
+  }, [income, mode]);
 
-    if (income > 316666.67) {
-      const bracket4 = Math.min(income, 358333.34) - 316666.67;
-      t4 = bracket4 * 0.30;
-    }
+  const formatCurrency = (val) =>
+    new Intl.NumberFormat("en-LK", {
+      style: "currency",
+      currency: "LKR"
+    }).format(val);
 
-    if(income>358333.34){
-        const bracket5 = income- 358333.34 ;
-        t5 = bracket5 * 0.36;
-    }
+  const formatRange = (i) => {
+    const lower = i === 0 ? 0 : brackets[i - 1].limit + 0.01;
+    const upper = brackets[i].limit !== Infinity ? brackets[i].limit : "and above";
+    return brackets[i].limit !== Infinity
+      ? `Rs. ${formatCurrency(lower).replace("LKR", "")} - Rs. ${formatCurrency(upper).replace("LKR", "")}`
+      : `Rs. ${formatCurrency(lower).replace("LKR", "")} and above`;
+  };
 
-    setTax1(t1);
-    setTax2(t2);
-    setTax3(t3);
-    setTax4(t4);
-    setTax5(t5);
-  }, [income]);
+  const totalTax = taxes.reduce((sum, t) => sum + t, 0);
 
   return (
     <div className="text-bracket-breakdown">
-      <h2>Tax Bracket Breakdown</h2>
+      <h2>Tax Bracket Breakdown ({mode === "monthly" ? "Monthly" : "Annual"})</h2>
       <table className="taxt-table" border={1}>
         <thead>
           <tr>
@@ -58,36 +74,16 @@ function TaxDispalyComponent() {
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td>0%</td>
-            <td>Rs. 0.00 - Rs. 150,000.00</td>
-            <td>Rs. 0.00</td>
-          </tr>
-          <tr>
-            <td>6%</td>
-            <td>Rs. 150,000.01 - Rs. 233,333.34</td>
-            <td>Rs. {tax1.toFixed(2)}</td>
-          </tr>
-          <tr>
-            <td>18%</td>
-            <td>Rs. 233,333.35 - Rs. 275,000.00</td>
-            <td>Rs. {tax2.toFixed(2)}</td>
-          </tr>
-          <tr>
-            <td>24%</td>
-            <td>Rs. 275,000.01 - Rs. 316,666.67</td>
-            <td>Rs. {tax3.toFixed(2)}</td>
-          </tr>
-          <tr>
-            <td>30%</td>
-            <td>Rs. 316,666.68 - Rs. 358,333.34</td>
-            <td>Rs. {tax4.toFixed(2)}</td>
+          {brackets.map((bracket, i) => (
+            <tr key={i}>
+              <td>{(bracket.rate * 100).toFixed(0)}%</td>
+              <td>{formatRange(i)}</td>
+              <td>{formatCurrency(taxes[i])}</td>
             </tr>
-            <tr>
-                <td>36%</td>
-                <td>Rs. 358333.34 Above</td>
-                <td>Rs. {tax5.toFixed(2)}</td>
-         
+          ))}
+          <tr className="total-row">
+            <td colSpan="2"><strong>Total Tax Payable</strong></td>
+            <td><strong>{formatCurrency(totalTax)}</strong></td>
           </tr>
         </tbody>
       </table>
@@ -95,4 +91,4 @@ function TaxDispalyComponent() {
   );
 }
 
-export default TaxDispalyComponent;
+export default TaxDisplayComponent;

@@ -77,10 +77,13 @@ function InputComponent() {
         />
       </div>
     </div>
-          {/* Correct Provider usage */}
-          <IncomeContext.Provider value={income}>
+
+          <IncomeContext.Provider value={{income,mode}}>
         <TaxDispalyComponent />
       </IncomeContext.Provider>
+    
+
+
     </>
   );
 }
